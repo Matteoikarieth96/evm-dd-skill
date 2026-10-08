@@ -2,7 +2,7 @@
 
 > v2.0 (2026-10-08): open-source release. Intake step added, field notes from about fifteen real runs merged into section 10 without project names, safety and fairness rules in section 11. History: v1.0 to v1.9 were private iterations (2026-10-02 to 2026-10-07).
 
-Reusable process for investor-angle due diligence on crypto and EVM projects. Angle: **investor** by default Angle: **investor** (would we back / hold / avoid, and why); the intake can switch the emphasis to a user or partner angle without changing the rubric.
+Reusable process for investor-angle due diligence on crypto and EVM projects. Angle: **investor** by default (would we back / hold / avoid, and why); the intake can switch the emphasis to a user or partner angle without changing the rubric.
 Language: English unless the intake says otherwise. Output per project: `sources/` (evidence), `report` (TL;DR + 3 pages + scorecard), `1-pager` (artifact).
 
 ## 0. Principles
