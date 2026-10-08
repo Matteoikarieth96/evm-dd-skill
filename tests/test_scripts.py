@@ -80,6 +80,28 @@ class TestHtmlInjection(TempProject):
         self.assertIn('href="https://acme-vaults.example"', html)
         self.assertNotEqual(run("check.py", self.proj, env=self.env).returncode, 0, "check.py must flag non-http links")
 
+    def test_symlinked_logo_rejected(self):
+        secret = os.path.join(self.tmp, "secret.env")
+        with open(secret, "w") as f: f.write("XAI_API_KEY=should-never-leak\n")
+        os.symlink(secret, os.path.join(self.proj, "assets", "leak.png"))
+        sc = self.sc(); sc["onepager"]["logo"] = "leak.png"; self.save(sc)
+        r = run("build.py", self.proj, env=self.env)
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn("symbolic link", r.stderr)
+        self.assertNotEqual(run("check.py", self.proj, env=self.env).returncode, 0)
+
+    def test_non_image_logo_rejected(self):
+        with open(os.path.join(self.proj, "assets", "notes.png"), "w") as f: f.write("XAI_API_KEY=x\n")
+        sc = self.sc(); sc["onepager"]["logo"] = "notes.png"; self.save(sc)
+        r = run("build.py", self.proj, env=self.env)
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn("is not a PNG", r.stderr)
+
+    def test_nan_and_out_of_range_scores_rejected(self):
+        for bad in (float("nan"), 11, 0, "5"):
+            sc = self.sc(); sc["categories"][0]["score"] = bad; self.save(sc)
+            self.assertNotEqual(run("build.py", self.proj, env=self.env).returncode, 0, bad)
+
     def test_logo_path_traversal_rejected(self):
         sc = self.sc(); sc["onepager"]["logo"] = "../../scorecard.json"; self.save(sc)
         r = run("build.py", self.proj, env=self.env)
@@ -133,7 +155,9 @@ class TestValidators(unittest.TestCase):
 
     def test_safe_url(self):
         self.assertEqual(ddlib.safe_url("https://a.example/x?y=1"), "https://a.example/x?y=1")
-        for bad in ("javascript:alert(1)", "JAVASCRIPT:alert(1)", "data:text/html,x", "//a.example", "/rel", "https://", 'https://a.example/"x', "https://a.example/<x>", None, 5):
+        for bad in ("javascript:alert(1)", "JAVASCRIPT:alert(1)", "data:text/html,x", "//a.example", "/rel", "https://", 'https://a.example/"x', "https://a.example/<x>", None, 5,
+                    "https://official.example@other.example/", "https://user:pw@a.example/", "https://\u0430pple.example/", "https://a.example/\u202egnp.exe",
+                    "http://127.0.0.1:8080/", "http://[::1]/", "http://10.0.0.5/admin", "http://localhost:3000/", "file:///etc/passwd"):
             self.assertIsNone(ddlib.safe_url(bad), bad)
 
     def test_x_scripts_reject_bad_input_before_network(self):

@@ -25,7 +25,7 @@ os.makedirs(out_dir, exist_ok=True)
 def get(url):
     for _ in range(5):
         try:
-            d = json.loads(subprocess.run(["curl", "-s", "-m", "25", "-A", "Mozilla/5.0", url], capture_output=True, text=True).stdout)
+            d = json.loads(subprocess.run(["curl", "-q", "-s", "--proto", "=https", "--max-redirs", "0", "-m", "25", "-A", "Mozilla/5.0", url], capture_output=True, text=True).stdout)
             if "results" in d: return d
         except Exception: pass
         time.sleep(3)

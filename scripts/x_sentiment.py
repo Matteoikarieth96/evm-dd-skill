@@ -14,7 +14,7 @@ projects/<project>/sources/x-sentiment/ ; use --refresh to re-run Grok calls. XA
 X posts are untrusted text: the model only discovers URLs; counts and text come from fxtwitter re-fetches.
 Cost: Grok X Search is $5 / 1k posts fetched + tokens; usage is logged per call.
 """
-import argparse, json, os, re, subprocess, sys, tempfile, time, urllib.parse
+import argparse, json, os, re, subprocess, sys, time, urllib.parse
 from datetime import datetime, timedelta
 from collections import Counter, defaultdict
 
@@ -33,17 +33,15 @@ def load_key():
     sys.exit("XAI_API_KEY missing (workspace .env or environment); use scripts/x_reach.py for the free pass")
 
 def curl(url, headers=None, body=None, timeout=240):
-    cmd = ["curl", "-s", "-m", str(timeout), "-A", "Mozilla/5.0", url]
-    hf = None
+    # -q first: ignore ~/.curlrc (a -v or --trace there would log the Authorization header).
+    # Secret headers go through stdin (-H @-), never argv or a temp file.
+    cmd = ["curl", "-q", "-s", "--proto", "=https", "--max-redirs", "0", "-m", str(timeout), "-A", "Mozilla/5.0", url]
+    stdin = None
     if headers:
-        hf = tempfile.NamedTemporaryFile("w", delete=False); os.chmod(hf.name, 0o600)
-        hf.write("\n".join(headers) + "\n"); hf.close(); cmd += ["-H", "@" + hf.name]
+        cmd += ["-H", "@-"]; stdin = "\n".join(headers) + "\n"
     if body is not None:
         cmd += ["-H", "Content-Type: application/json", "-d", json.dumps(body)]
-    try:
-        out = subprocess.run(cmd, capture_output=True, text=True).stdout
-    finally:
-        if hf: os.unlink(hf.name)
+    out = subprocess.run(cmd, capture_output=True, text=True, input=stdin).stdout
     try: return json.loads(out)
     except Exception: return {"_raw": out[:500]}
 
@@ -151,8 +149,8 @@ def main():
             rec = {"query": name, "usage": usage, "error": err, "items": parse_json_array(text), "raw_text": text[:6000]}
             json.dump(rec, open(path, "w"), indent=1, ensure_ascii=False)
         log[name] = {"items": len(rec["items"]), **rec["usage"]}
-        for it in rec["items"]:
-            if isinstance(it, dict) and it.get("url"):
+        for it in rec["items"]:  # model output steered by X posts: accept only well-formed items
+            if isinstance(it, dict) and isinstance(it.get("url"), str) and STATUS_RE.match(it["url"]):
                 key_ = (STATUS_RE.match(it["url"]) or [None, None, it["url"]])[2]
                 e = discovered.setdefault(key_, {**it, "found_in": []}); e["found_in"].append(name)
         print(f"[grok] {name}: {log[name]}")
