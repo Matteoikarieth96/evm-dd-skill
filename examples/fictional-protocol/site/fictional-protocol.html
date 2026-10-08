@@ -1,0 +1,258 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Acme Vaults Due Diligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@500;600&family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  /* Layout concept: an investor tearsheet. A white sheet on a cool grey ground, hairline rules, data set in mono, one blue for marks and links.
+     Score bands use the fixed status colours with a text label so colour never carries meaning alone. */
+  --bg:#E9ECF0; --sheet:#FFFFFF; --sheet-2:#F5F6F8; --ink:#111827; --ink-2:#434B59; --ink-3:#69717F; --rule:#D5D9E0;
+  --accent:#1C5CAB; --accent-soft:#E6EEFA; --track:#E7EAEF; --bar:#9EC5F4; --bar-hi:#1C5CAB;
+  --weak:#EC835A; --mixed:#FAB219; --good:#0CA30C; --critical:#D03B3B;
+  --f-display:'Bricolage Grotesque','Avenir Next','Segoe UI',system-ui,sans-serif;
+  --f-body:'Public Sans','Segoe UI',system-ui,-apple-system,sans-serif;
+  --f-mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0C0F14; --sheet:#151922; --sheet-2:#1B202B; --ink:#F1F3F6; --ink-2:#B4BBC7; --ink-3:#8D95A3; --rule:#2B313D;
+  --accent:#86B6EF; --accent-soft:#1A2740; --track:#262C38; --bar:#256ABF; --bar-hi:#86B6EF; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0C0F14; --sheet:#151922; --sheet-2:#1B202B; --ink:#F1F3F6; --ink-2:#B4BBC7; --ink-3:#8D95A3; --rule:#2B313D;
+  --accent:#86B6EF; --accent-soft:#1A2740; --track:#262C38; --bar:#256ABF; --bar-hi:#86B6EF; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:14px/1.55 var(--f-body);padding-inline:16px;padding-block:0 48px}
+a{color:var(--accent);text-underline-offset:2px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.15;margin:0}
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  max-width:980px;margin:0 auto;padding:10px 0;background:var(--bg)}
+.nav .brand{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:700;font-size:15px}
+.nav .brand .logo{color:var(--ink)}
+.tabs{display:flex;gap:4px;background:var(--track);padding:3px;border-radius:8px}
+.tabs button{font:600 13px var(--f-body);color:var(--ink-2);background:transparent;border:0;padding:7px 14px;border-radius:6px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--sheet);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.tabs button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+main{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;padding:32px;min-width:0}
+.logo{color:var(--ink);flex:none}
+.eyebrow{font:500 11px/1.3 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.small{font-size:12px;color:var(--ink-3);margin:8px 0 0}
+.num{font-family:var(--f-mono);text-align:right;font-variant-numeric:tabular-nums}
+
+/* ---- 1-pager */
+.op-head{display:flex;justify-content:space-between;gap:24px;align-items:flex-start;flex-wrap:wrap;padding-bottom:20px;border-bottom:2px solid var(--ink)}
+.op-head .id{display:flex;gap:16px;align-items:center;min-width:0;flex:1 1 380px}
+.op-head h1{font-size:44px;font-weight:800;letter-spacing:-.02em;margin:2px 0 4px}
+.tag{margin:0;color:var(--ink-2);max-width:46ch}
+.rating{display:flex;flex-direction:column;align-items:flex-end;gap:4px;text-align:right}
+.r-num{display:flex;align-items:baseline;gap:4px;font-family:var(--f-display)}
+.r-num b{font-size:64px;line-height:.95;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.r-num span{font-size:20px;color:var(--ink-3);font-weight:600}
+.r-meta{font:500 11px/1.4 var(--f-mono);color:var(--ink-3)}
+.verdict{display:inline-flex;align-items:center;gap:7px;margin-top:4px;padding:5px 11px;border:1.5px solid var(--ink);border-radius:999px;font:700 12px var(--f-body);letter-spacing:.02em}
+.tldr{margin:18px 0;font-size:15px;line-height:1.55;max-width:78ch}
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);border-block:1px solid var(--rule)}
+.kpi{padding:12px 12px 12px 14px;border-left:1px solid var(--rule);min-width:0}
+.kpi:first-child{border-left:0;padding-left:0}
+.kpi .k{font:500 10.5px var(--f-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+.kpi .v{font:800 26px/1.15 var(--f-display);letter-spacing:-.02em;margin:3px 0 1px;font-variant-numeric:tabular-nums}
+.kpi .s{font-size:11.5px;color:var(--ink-2);line-height:1.35}
+.op-grid{display:grid;grid-template-columns:1.05fr 1fr;gap:28px;margin-top:22px}
+.col{min-width:0}
+.col h2,.verdict-box h2{font:700 12px var(--f-mono);letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);padding-bottom:6px;margin:0 0 10px;border-bottom:1px solid var(--rule)}
+.col h2:not(:first-child){margin-top:20px}
+.bars{display:flex;flex-direction:column;gap:7px}
+.bar-row{display:grid;grid-template-columns:minmax(120px,190px) 1fr 92px;gap:10px;align-items:center}
+.bar-name{font-size:12.5px;line-height:1.25}
+.bar-id{font:600 10.5px var(--f-mono);color:var(--ink-3);margin-right:6px}
+.bar-track{position:relative;height:10px;background:var(--track);border-radius:2px;overflow:hidden}
+.bar-track::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--sheet)}
+.bar-fill{position:relative;z-index:1;height:100%;border-radius:0 3px 3px 0}
+.bar-fill.weak{background:var(--weak)} .bar-fill.mixed{background:var(--mixed)} .bar-fill.good{background:var(--good)} .bar-fill.critical{background:var(--critical)}
+.bar-val{display:flex;align-items:baseline;gap:6px;font-variant-numeric:tabular-nums}
+.bar-val b{font:700 14px var(--f-mono)}
+.bar-band{font-size:11px;color:var(--ink-3)}
+.bar-axis{display:grid;grid-template-columns:minmax(120px,190px) 1fr 92px;gap:10px}
+.bar-ticks{display:flex;justify-content:space-between;font:500 10px var(--f-mono);color:var(--ink-3)}
+.bar-ticks i{font-style:normal}
+.sr{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
+.sr li{position:relative;padding-left:20px;font-size:13px;line-height:1.45}
+.sr li::before{position:absolute;left:0;top:0;font:700 14px/1.3 var(--f-mono)}
+.sr.plus li::before{content:"+";color:var(--good)} .sr.minus li::before{content:"\2212";color:var(--critical)}
+.tbl{overflow-x:auto;max-width:100%}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:6px 10px 6px 0;text-align:left;vertical-align:top;border-bottom:1px solid var(--rule)}
+thead th{font:600 11px var(--f-mono);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);border-bottom:1.5px solid var(--ink)}
+.kv th{width:30%;font-weight:600;color:var(--ink-2);font-size:12.5px;padding-right:10px}
+.kv td{font-size:12.5px}
+.peers th{width:34%}
+.verdict-box{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:24px;margin-top:22px;padding:16px 18px;background:var(--sheet-2);border:1px solid var(--rule);border-radius:3px}
+.verdict-box p,.verdict-box li{font-size:12.5px;line-height:1.45;margin:0}
+.verdict-box ul{margin:0;padding-left:16px;display:flex;flex-direction:column;gap:4px}
+.links{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:18px;font:500 12px var(--f-mono)}
+.foot{margin-top:16px;padding-top:12px;border-top:1px solid var(--rule);font-size:11px;color:var(--ink-3);line-height:1.5}
+
+/* ---- report */
+.rpt{padding:40px 44px}
+.rpt h1{font-size:30px;font-weight:800;letter-spacing:-.02em;margin-bottom:14px}
+.rpt h2{font-size:19px;font-weight:700;margin:28px 0 10px;padding-top:14px;border-top:1px solid var(--rule)}
+.rpt h3{font-size:15px;margin:18px 0 6px}
+.rpt p,.rpt li{max-width:76ch}
+.rpt ul,.rpt ol{padding-left:20px;display:flex;flex-direction:column;gap:5px;margin:8px 0}
+.rpt p{margin:8px 0}
+.rpt code{font:12px var(--f-mono);background:var(--sheet-2);padding:1px 5px;border-radius:3px}
+.rpt .tbl{margin:10px 0 14px}
+.rpt table{font-size:12.5px}
+.rpt td,.rpt th{padding:7px 12px 7px 0}
+.run{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font:500 11px var(--f-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);padding-bottom:10px;margin-bottom:20px;border-bottom:1px solid var(--rule)}
+.cover-head{display:flex;gap:16px;align-items:center;padding-bottom:16px;margin-bottom:14px;border-bottom:2px solid var(--ink)}
+.cover-head h1{font-size:46px;margin:2px 0 0}
+.rate-mini{margin-left:auto;display:flex;align-items:baseline;gap:3px;font-family:var(--f-display)}
+.rate-mini b{font-size:54px;font-weight:800;letter-spacing:-.03em;line-height:1}
+.rate-mini span{font-size:18px;color:var(--ink-3);font-weight:600}
+.cover .bars{margin-top:22px;max-width:640px}
+.figure{margin:22px 0 8px}
+.figure figcaption{font-size:13px;margin-bottom:8px;max-width:76ch}
+.chart{width:100%;height:auto;display:block;overflow:visible}
+.chart .grid{stroke:var(--rule);stroke-width:1}.chart .grid.base{stroke:var(--ink-3)}
+.chart .axis{font:500 10.5px var(--f-mono);fill:var(--ink-3)}
+.chart .note{font:500 11px var(--f-body);fill:var(--ink)}
+.chart .lead{stroke:var(--ink-3);stroke-width:1}
+.chart .b{fill:var(--bar)} .chart .b.hi{fill:var(--bar-hi)} .chart .b:hover{fill:var(--bar-hi)}
+.chart-src{font-size:11px;color:var(--ink-3);margin-top:6px}
+.tableview{margin-top:8px;font-size:12.5px}
+.tableview summary{cursor:pointer;color:var(--accent);font-weight:600}
+.tableview table{max-width:420px;margin-top:6px}
+#tip{position:fixed;z-index:20;pointer-events:none;max-width:320px;padding:8px 10px;border-radius:5px;font-size:12px;line-height:1.4;background:var(--ink);color:var(--sheet);box-shadow:0 4px 14px rgba(0,0,0,.25);opacity:0;transition:opacity .08s}
+#tip.on{opacity:1}
+
+@media screen and (max-width:820px){
+  .kpis{grid-template-columns:repeat(3,1fr)}
+  .kpi:nth-child(4){border-left:0;padding-left:0}
+  .kpi{border-bottom:1px solid var(--rule)}
+  .op-grid,.verdict-box{grid-template-columns:1fr}
+  .rating{align-items:flex-start;text-align:left}
+}
+@media screen and (max-width:560px){
+  .sheet,.rpt{padding:20px 16px}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .kpi:nth-child(odd){border-left:0;padding-left:0}.kpi:nth-child(even){border-left:1px solid var(--rule);padding-left:14px}
+  .kpi:nth-child(4){border-left:1px solid var(--rule);padding-left:14px}
+  .op-head h1{font-size:34px}.r-num b{font-size:52px}
+  .bar-row,.bar-axis{grid-template-columns:1fr 86px}
+  .bar-name{grid-column:1 / -1}
+  .bar-axis span:first-child{display:none}
+  .cover-head{flex-wrap:wrap}.cover-head h1{font-size:36px}
+  .nav .brand span{display:none}
+}
+@media print{
+  @page{size:A4;margin:0}
+  html,body{background:#fff !important;padding:0 !important}
+  .nav,#tip,#view-report{display:none !important}
+  main{max-width:none;margin:0}
+  .sheet{border:0;border-radius:0;zoom:.72;width:calc(210mm / .72);min-height:calc(295mm / .72);padding:11mm 12mm;overflow:visible}
+  .op-head{padding-bottom:14px}
+  .kv th,.kv td{padding-block:4px}
+  .op-head h1{font-size:40px}.r-num b{font-size:56px}
+  .tldr{font-size:14px;margin:14px 0}
+  .kpi{padding-block:10px}.kpi .v{font-size:24px}
+  .op-grid{gap:26px;margin-top:16px}
+  .bars{gap:6px}
+  .verdict-box{margin-top:16px;padding:14px 16px}
+  .links{margin-top:14px}
+  .foot{margin-top:12px}
+}
+.logo-mono{display:inline-grid;place-items:center;border:2px solid currentColor;border-radius:50%;font-family:var(--f-display);font-weight:800;line-height:1}
+.logo-img{background:#fff;border-radius:8px;padding:3px;max-width:160px;object-fit:contain}
+#view-report:not([hidden]){display:flex;flex-direction:column;gap:20px}
+[hidden]{display:none !important}
+@media (prefers-reduced-motion:reduce){*{transition:none !important}}
+</style></head><body>
+<header class="nav"><div class="brand"><svg class="logo" width="22" height="22" viewBox="0 0 64 64" role="img" aria-label="Acme Vaults logo"><path d="M32 4 L60 56 L44 56 L32 32 L20 56 L4 56 Z M26 46 L38 46 L32 34 Z" fill="currentColor"/></svg><span>Acme Vaults due diligence</span></div>
+<div class="tabs" role="tablist"><button role="tab" data-view="onepager" aria-selected="true">1-pager</button><button role="tab" data-view="report" aria-selected="false">Full report</button></div></header>
+<main>
+<div id="view-onepager">
+<article class="sheet op" id="op-sheet">
+  <header class="op-head">
+    <div class="id">
+      <svg class="logo" width="52" height="52" viewBox="0 0 64 64" role="img" aria-label="Acme Vaults logo"><path d="M32 4 L60 56 L44 56 L32 32 L20 56 L4 56 Z M26 46 L38 46 L32 34 Z" fill="currentColor"/></svg>
+      <div>
+        <div class="eyebrow">DeFi / Yield vaults · Fictional chain · USDC</div>
+        <h1>Acme Vaults</h1>
+        <p class="tag">Curated USDC yield vaults that keep a 10% performance fee on the yield they earn. <b>Fictional example.</b></p>
+      </div>
+    </div>
+    <div class="rating" aria-label="Final rating 4.8 out of 10">
+      <div class="r-num"><b>4.8</b><span>/10</span></div>
+      <div class="r-meta">Average of 8 categories<br>Confidence: Medium</div>
+      <div class="verdict"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>WATCH, do not back yet</div>
+    </div>
+  </header>
+  <p class="tldr"><b>TL;DR.</b> A small, real-yield vault business with doxxed founders and verified deposits of $41.2M, a third of the homepage claim. The 2-of-3 Safe can upgrade the vault with no delay, which caps security at 4. Fee income is modest and the category is crowded. Watch for a timelock and published points rules.</p>
+  <section class="kpis" aria-label="Key numbers"><div class="kpi"><div class="k">Deposits</div><div class="v">$41.2M</div><div class="s">verified, <code>totalAssets()</code></div></div><div class="kpi"><div class="k">Homepage TVL</div><div class="v">$120M</div><div class="s">claimed</div></div><div class="kpi"><div class="k">Depositors</div><div class="v">2,310</div><div class="s">top 10 hold 58%</div></div><div class="kpi"><div class="k">Fee income</div><div class="v">$0.6M</div><div class="s">per year, derived</div></div><div class="kpi"><div class="k">Rank vs direct peers</div><div class="v">#4 of 7</div><div class="s">on deposits</div></div><div class="kpi"><div class="k">Funding</div><div class="v">$4M</div><div class="s">seed, 2026</div></div></section>
+  <div class="op-grid">
+    <section class="col">
+      <h2>Scorecard</h2>
+      <div class="bars"><div class="bar-row" data-tip="M1 Technology and security: 4.0/10 (High confidence). Verified ERC-4626 vault and one audit, but a 2-of-3 Safe with no timelock can upgrade the vault instantly (simulated). Admin-key cap applies; about 5.5 without it."><div class="bar-name"><span class="bar-id">M1</span>Technology and security</div><div class="bar-track" role="img" aria-label="Technology and security 4.0 out of 10"><div class="bar-fill weak" style="width:40.0%"></div></div><div class="bar-val"><b>4.0</b><span class="bar-band">Weak</span></div></div><div class="bar-row" data-tip="M2 Legal and regulatory: 3.5/10 (Medium confidence). Entity named in the ToS but not found in a registry; no licence claimed; US exclusion in the ToS is not enforced by the app."><div class="bar-name"><span class="bar-id">M2</span>Legal and regulatory</div><div class="bar-track" role="img" aria-label="Legal and regulatory 3.5 out of 10"><div class="bar-fill weak" style="width:35.0%"></div></div><div class="bar-val"><b>3.5</b><span class="bar-band">Weak</span></div></div><div class="bar-row" data-tip="M3 Business model and economics: 5.0/10 (Medium confidence). Clear 10% performance fee on real yield, about $0.6M derived annual fee income; seed of $4M."><div class="bar-name"><span class="bar-id">M3</span>Business model and economics</div><div class="bar-track" role="img" aria-label="Business model and economics 5.0 out of 10"><div class="bar-fill mixed" style="width:50.0%"></div></div><div class="bar-val"><b>5.0</b><span class="bar-band">Mixed</span></div></div><div class="bar-row" data-tip="M4 Team: 6.0/10 (High confidence). Two doxxed founders with verifiable DeFi roles; small team, hiring one engineer."><div class="bar-name"><span class="bar-id">M4</span>Team</div><div class="bar-track" role="img" aria-label="Team 6.0 out of 10"><div class="bar-fill mixed" style="width:60.0%"></div></div><div class="bar-val"><b>6.0</b><span class="bar-band">Mixed</span></div></div><div class="bar-row" data-tip="M5 Traction and metrics: 5.5/10 (High confidence). $41.2M deposits from 2,310 wallets (verified), but the homepage claims $120M and deposits fell 35% after the boost."><div class="bar-name"><span class="bar-id">M5</span>Traction and metrics</div><div class="bar-track" role="img" aria-label="Traction and metrics 5.5 out of 10"><div class="bar-fill mixed" style="width:55.0%"></div></div><div class="bar-val"><b>5.5</b><span class="bar-band">Mixed</span></div></div><div class="bar-row" data-tip="M6 Tokenomics and governance: 4.5/10 (Medium confidence). No token; points programme without published rules; control sits with the founders&#x27; Safe."><div class="bar-name"><span class="bar-id">M6</span>Tokenomics and governance</div><div class="bar-track" role="img" aria-label="Tokenomics and governance 4.5 out of 10"><div class="bar-fill weak" style="width:45.0%"></div></div><div class="bar-val"><b>4.5</b><span class="bar-band">Weak</span></div></div><div class="bar-row" data-tip="M7 Market, peers and valuation: 5.0/10 (Medium confidence). Crowded category with six larger peers; illustrative band $12M to $22M from peer multiples, not a price target."><div class="bar-name"><span class="bar-id">M7</span>Market, peers and valuation</div><div class="bar-track" role="img" aria-label="Market, peers and valuation 5.0 out of 10"><div class="bar-fill mixed" style="width:50.0%"></div></div><div class="bar-val"><b>5.0</b><span class="bar-band">Mixed</span></div></div><div class="bar-row" data-tip="M8 Community and X sentiment: 5.2/10 (Low confidence). Free reach pass only: median 2,100 views per post, between two peers; one lookalike account; sentiment not measured."><div class="bar-name"><span class="bar-id">M8</span>Community and X sentiment</div><div class="bar-track" role="img" aria-label="Community and X sentiment 5.2 out of 10"><div class="bar-fill mixed" style="width:52.0%"></div></div><div class="bar-val"><b>5.2</b><span class="bar-band">Mixed</span></div></div><div class="bar-axis" aria-hidden="true"><span></span><div class="bar-ticks"><i>0</i><i>5</i><i>10</i></div><span></span></div></div>
+      <p class="small">Scale 1 to 10, equal weights. Tech is capped at 4 by the admin-key rule (about 5.5 without it).</p>
+      <h2>Key facts</h2>
+      <div class="tbl"><table class="kv"><tbody><tr><th>Entity</th><td>Acme Vaults Ltd (fictional), registry n/d</td></tr><tr><th>Team</th><td>2 founders, doxxed</td></tr><tr><th>Funding</th><td>$4M seed</td></tr><tr><th>Token</th><td>None; points programme</td></tr><tr><th>Audits</th><td>1 (2026-06), 2 high fixed</td></tr><tr><th>Admin</th><td>2-of-3 Safe, no timelock</td></tr><tr><th>Licence</th><td>None claimed</td></tr><tr><th>Revenue</th><td>about $0.6M per year, derived</td></tr></tbody></table></div>
+    </section>
+    <section class="col">
+      <h2>Strengths</h2><ul class="sr plus"><li>Real yield with a simple fee model, no emissions needed to pay depositors.</li><li>Verified contracts, one audit with all high findings fixed.</li><li>Doxxed founders with verifiable DeFi track records.</li></ul>
+      <h2>Risks</h2><ul class="sr minus"><li>A 2-of-3 Safe can upgrade the vault instantly: no timelock over user funds.</li><li>Deployed code is 140 lines larger than the audited commit.</li><li>Homepage TVL is three times verified deposits.</li><li>Deposits fell 35% when the points boost ended.</li></ul>
+      <h2>Peers</h2><div class="tbl"><table class="kv peers"><tbody><tr><th>Peer A (EVM)</th><td>mcap $310M, TVL $900M</td><td>mcap/TVL 0.34</td></tr><tr><th>Peer B (Solana)</th><td>mcap $95M, TVL $210M</td><td>mcap/TVL 0.45</td></tr><tr><th>Peer C (Move)</th><td>no token, TVL $60M</td><td>n/a</td></tr></tbody></table></div><p class="small">Illustrative value if tokenised, from peer mcap/TVL quartiles: $12M to $22M. Not a price target.</p>
+    </section>
+  </div>
+  <section class="verdict-box">
+    <div><h2>Investor view</h2><p><b>Equity:</b> fair at seed terms only with a timelock commitment. <b>Token / protocol exposure:</b> nothing to buy yet; points farming carries the admin risk. <b>As a user:</b> size deposits to what you can lose to an upgrade.</p></div>
+    <div><h2>Would raise the rating</h2><ul><li>A 48 h or longer timelock on the ProxyAdmin</li><li>A second audit of the deployed code</li><li>Deposits holding up without boosts</li></ul></div>
+    <div><h2>Would lower it</h2><ul><li>An upgrade without notice</li><li>Enforcement against the front-end</li><li>Further deposit outflows</li></ul></div>
+  </section>
+  <nav class="links" aria-label="Links"><a href="https://acme-vaults.example" target="_blank" rel="noopener noreferrer">Website</a><a href="https://docs.acme-vaults.example" target="_blank" rel="noopener noreferrer">Docs</a><a href="https://audits.example/acme-vaults-2026.pdf" target="_blank" rel="noopener noreferrer">Audit</a><a href="https://explorer.example/address/0x1111111111111111111111111111111111111111" target="_blank" rel="noopener noreferrer">Explorer</a></nav>
+  <footer class="foot">As of 2026-10-08. FICTIONAL EXAMPLE: the project, people, numbers and sources are invented. Not investment advice. Rating is the simple average of 8 category scores in scorecard.json.</footer>
+</article></div>
+<div id="view-report" hidden><article class="sheet rpt cover"><header class="cover-head"><svg class="logo" width="40" height="40" viewBox="0 0 64 64" role="img" aria-label="Acme Vaults logo"><path d="M32 4 L60 56 L44 56 L32 32 L20 56 L4 56 Z M26 46 L38 46 L32 34 Z" fill="currentColor"/></svg><div><div class="eyebrow">Due diligence report, investor angle</div><h1>Acme Vaults</h1></div><div class="rate-mini"><b>4.8</b><span>/10</span></div></header><p><b>Project:</b> Acme Vaults (<a href="https://acme-vaults.example" target="_blank" rel="noopener noreferrer">https://acme-vaults.example</a>) | <b>Sector:</b> DeFi yield vaults | <b>Chain:</b> fictional | <b>Angle:</b> investor | <b>As of:</b> 2026-10-08 <b>Final rating: 4.8 / 10</b> (simple average of 8 categories, average confidence Medium) | <b>Verdict: WATCH, do not back yet</b></p>
+<p>This is a <b>fictional example</b>: the project, people, numbers and sources are invented to show the format. Evidence base: <code>sources/01</code> to <code>06</code>, <code>sources/09-crosscheck.md</code>. Numbers marked <i>verified</i> were reproduced from the primary source or onchain; numbers marked <i>claimed</i> come from the website. Not investment advice.</p><h2>TL;DR</h2><ol><li>Acme Vaults runs curated USDC vaults and keeps a 10% performance fee on the yield.</li><li>Verified deposits are $41.2M from 2,310 wallets, fourth of seven direct peers.</li><li>The homepage claims $120M because it counts reward tokens at list price.</li><li>A 2-of-3 Safe can upgrade the vault instantly; the deployed code differs from the audited commit.</li><li>Rating 4.8, WATCH: a timelock and a second audit would move it up.</li></ol><div class="bars"><div class="bar-row" data-tip="M1 Technology and security: 4.0/10 (High confidence). Verified ERC-4626 vault and one audit, but a 2-of-3 Safe with no timelock can upgrade the vault instantly (simulated). Admin-key cap applies; about 5.5 without it."><div class="bar-name"><span class="bar-id">M1</span>Technology and security</div><div class="bar-track" role="img" aria-label="Technology and security 4.0 out of 10"><div class="bar-fill weak" style="width:40.0%"></div></div><div class="bar-val"><b>4.0</b><span class="bar-band">Weak</span></div></div><div class="bar-row" data-tip="M2 Legal and regulatory: 3.5/10 (Medium confidence). Entity named in the ToS but not found in a registry; no licence claimed; US exclusion in the ToS is not enforced by the app."><div class="bar-name"><span class="bar-id">M2</span>Legal and regulatory</div><div class="bar-track" role="img" aria-label="Legal and regulatory 3.5 out of 10"><div class="bar-fill weak" style="width:35.0%"></div></div><div class="bar-val"><b>3.5</b><span class="bar-band">Weak</span></div></div><div class="bar-row" data-tip="M3 Business model and economics: 5.0/10 (Medium confidence). Clear 10% performance fee on real yield, about $0.6M derived annual fee income; seed of $4M."><div class="bar-name"><span class="bar-id">M3</span>Business model and economics</div><div class="bar-track" role="img" aria-label="Business model and economics 5.0 out of 10"><div class="bar-fill mixed" style="width:50.0%"></div></div><div class="bar-val"><b>5.0</b><span class="bar-band">Mixed</span></div></div><div class="bar-row" data-tip="M4 Team: 6.0/10 (High confidence). Two doxxed founders with verifiable DeFi roles; small team, hiring one engineer."><div class="bar-name"><span class="bar-id">M4</span>Team</div><div class="bar-track" role="img" aria-label="Team 6.0 out of 10"><div class="bar-fill mixed" style="width:60.0%"></div></div><div class="bar-val"><b>6.0</b><span class="bar-band">Mixed</span></div></div><div class="bar-row" data-tip="M5 Traction and metrics: 5.5/10 (High confidence). $41.2M deposits from 2,310 wallets (verified), but the homepage claims $120M and deposits fell 35% after the boost."><div class="bar-name"><span class="bar-id">M5</span>Traction and metrics</div><div class="bar-track" role="img" aria-label="Traction and metrics 5.5 out of 10"><div class="bar-fill mixed" style="width:55.0%"></div></div><div class="bar-val"><b>5.5</b><span class="bar-band">Mixed</span></div></div><div class="bar-row" data-tip="M6 Tokenomics and governance: 4.5/10 (Medium confidence). No token; points programme without published rules; control sits with the founders&#x27; Safe."><div class="bar-name"><span class="bar-id">M6</span>Tokenomics and governance</div><div class="bar-track" role="img" aria-label="Tokenomics and governance 4.5 out of 10"><div class="bar-fill weak" style="width:45.0%"></div></div><div class="bar-val"><b>4.5</b><span class="bar-band">Weak</span></div></div><div class="bar-row" data-tip="M7 Market, peers and valuation: 5.0/10 (Medium confidence). Crowded category with six larger peers; illustrative band $12M to $22M from peer multiples, not a price target."><div class="bar-name"><span class="bar-id">M7</span>Market, peers and valuation</div><div class="bar-track" role="img" aria-label="Market, peers and valuation 5.0 out of 10"><div class="bar-fill mixed" style="width:50.0%"></div></div><div class="bar-val"><b>5.0</b><span class="bar-band">Mixed</span></div></div><div class="bar-row" data-tip="M8 Community and X sentiment: 5.2/10 (Low confidence). Free reach pass only: median 2,100 views per post, between two peers; one lookalike account; sentiment not measured."><div class="bar-name"><span class="bar-id">M8</span>Community and X sentiment</div><div class="bar-track" role="img" aria-label="Community and X sentiment 5.2 out of 10"><div class="bar-fill mixed" style="width:52.0%"></div></div><div class="bar-val"><b>5.2</b><span class="bar-band">Mixed</span></div></div><div class="bar-axis" aria-hidden="true"><span></span><div class="bar-ticks"><i>0</i><i>5</i><i>10</i></div><span></span></div></div></article><article class="sheet rpt"><header class="run"><span>Acme Vaults due diligence</span><span>Page 1 of 3: Overview and business</span></header><h2>What it is</h2>
+<p>Depositors put USDC into an ERC-4626 vault; a curator allocates it to lending markets and the protocol keeps 10% of the yield.</p>
+<h2>How the money flows (verified)</h2>
+<p>Deposits sit in the vault proxy; yield accrues to share price; the fee is minted as shares to the treasury Safe at each harvest.</p>
+<h2>Key metrics: claimed versus verified</h2>
+<div class="tbl"><table><thead><tr><th>Metric</th><th>Claimed</th><th>Verified</th><th>Source and date</th></tr></thead><tbody><tr><td>TVL</td><td>$120M</td><td>$41.2M deposits</td><td><code>totalAssets()</code>, 2026-10-08</td></tr><tr><td>Users</td><td>&quot;5,000+&quot;</td><td>2,310 wallets</td><td>explorer holders, 2026-10-08</td></tr></tbody></table></div>
+<figure class="figure"><figcaption><b>Vault deposits by week, $M (fictional)</b>. Deposits rose during the points boost (Aug 3 to Sep 7) and fell 35% after it ended.</figcaption><svg class="chart" viewBox="0 0 760 250" role="img" aria-label="Bar chart of weekly vault deposits in millions of dollars"><line x1="46" x2="746" y1="218.0" y2="218.0" class="grid base"/><text x="38" y="222.0" class="axis" text-anchor="end">0</text><line x1="46" x2="746" y1="154.0" y2="154.0" class="grid"/><text x="38" y="158.0" class="axis" text-anchor="end">20</text><line x1="46" x2="746" y1="90.0" y2="90.0" class="grid"/><text x="38" y="94.0" class="axis" text-anchor="end">40</text><line x1="46" x2="746" y1="26.0" y2="26.0" class="grid"/><text x="38" y="30.0" class="axis" text-anchor="end">60</text><rect x="46.00" y="198.48" width="52.85" height="19.52" rx="1" class="b" data-tip="Week 1: $6.1M"/><text x="46.0" y="240" class="axis" text-anchor="start">Jul 6</text><rect x="99.85" y="194.32" width="52.85" height="23.68" rx="1" class="b" data-tip="Week 2: $7.4M"/><rect x="153.69" y="189.20" width="52.85" height="28.80" rx="1" class="b" data-tip="Week 3: $9.0M"/><rect x="207.54" y="177.04" width="52.85" height="40.96" rx="1" class="b" data-tip="Week 4: $12.8M"/><rect x="261.38" y="158.80" width="52.85" height="59.20" rx="1" class="b" data-tip="Week 5: $18.5M"/><text x="261.4" y="240" class="axis" text-anchor="start">Aug 3</text><rect x="315.23" y="134.80" width="52.85" height="83.20" rx="1" class="b" data-tip="Week 6: $26.0M"/><rect x="369.08" y="109.52" width="52.85" height="108.48" rx="1" class="b" data-tip="Week 7: $33.9M"/><rect x="422.92" y="76.56" width="52.85" height="141.44" rx="1" class="b" data-tip="Week 8: $44.2M"/><rect x="476.77" y="57.04" width="52.85" height="160.96" rx="1" class="b hi" data-tip="Week 9: $50.3M"/><text x="476.8" y="240" class="axis" text-anchor="start">Aug 31</text><rect x="530.62" y="67.60" width="52.85" height="150.40" rx="1" class="b" data-tip="Week 10: $47.0M"/><rect x="584.46" y="84.24" width="52.85" height="133.76" rx="1" class="b" data-tip="Week 11: $41.8M"/><rect x="638.31" y="95.76" width="52.85" height="122.24" rx="1" class="b" data-tip="Week 12: $38.2M"/><rect x="692.15" y="86.16" width="52.85" height="131.84" rx="1" class="b" data-tip="Week 13: $41.2M"/><text x="692.2" y="240" class="axis" text-anchor="start">Sep 28</text><text x="495.2" y="16" class="note" text-anchor="end">Boost ends</text><line x1="497.2" x2="503.2" y1="12" y2="28" class="lead"/></svg><div class="chart-src">Source: fictional example data.</div><details class="tableview"><summary>View as table</summary><div class="tbl"><table><thead><tr><th>Week</th><th class=num>$M</th></tr></thead><tbody><tr><td>Jul 6</td><td class=num>6.1</td></tr><tr><td>2</td><td class=num>7.4</td></tr><tr><td>3</td><td class=num>9.0</td></tr><tr><td>4</td><td class=num>12.8</td></tr><tr><td>Aug 3</td><td class=num>18.5</td></tr><tr><td>6</td><td class=num>26.0</td></tr><tr><td>7</td><td class=num>33.9</td></tr><tr><td>8</td><td class=num>44.2</td></tr><tr><td>Aug 31</td><td class=num>50.3</td></tr><tr><td>10</td><td class=num>47.0</td></tr><tr><td>11</td><td class=num>41.8</td></tr><tr><td>12</td><td class=num>38.2</td></tr><tr><td>Sep 28</td><td class=num>41.2</td></tr></tbody></table></div></details></figure><h2>Weekly deposits</h2>
+<p>Deposits rose during the points boost and fell 35% after it ended.</p></article><article class="sheet rpt"><header class="run"><span>Acme Vaults due diligence</span><span>Page 2 of 3: Technology, legal, team</span></header><h2>Technology and security (M1)</h2>
+<p>The vault is verified and audited once. The ProxyAdmin owner is a 2-of-3 Safe with no timelock: a simulated <code>upgradeAndCall</code> from the Safe succeeds, from a random address it reverts. The admin-key cap applies.</p>
+<h2>Legal and regulatory (M2)</h2>
+<p>The ToS names Acme Vaults Ltd; no registry entry was found (n/d). No licence is claimed. The ToS excludes US persons but the app does not geoblock.</p>
+<h2>Team (M4)</h2>
+<div class="tbl"><table><thead><tr><th>Person</th><th>Role</th><th>Background</th><th>Verified how</th></tr></thead><tbody><tr><td>Founder A (fictional)</td><td>CEO</td><td>Former DeFi BD lead</td><td>Public profile</td></tr><tr><td>Founder B (fictional)</td><td>CTO</td><td>Former vault engineer</td><td>GitHub history</td></tr></tbody></table></div></article><article class="sheet rpt"><header class="run"><span>Acme Vaults due diligence</span><span>Page 3 of 3: Market, traction, risks, verdict</span></header><h2>Market, peers and relative valuation (M7)</h2>
+<div class="tbl"><table><thead><tr><th>Peer</th><th>Tier</th><th>Chain</th><th>Token</th><th>Mcap</th><th>FDV</th><th>TVL</th><th>Revenue (annualised)</th><th>Mcap/TVL</th><th>vs project</th></tr></thead><tbody><tr><td>Peer A</td><td>A</td><td>EVM</td><td>yes</td><td>$310M</td><td>$620M</td><td>$900M</td><td>n/d</td><td>0.34</td><td>22x larger</td></tr><tr><td>Peer B</td><td>A</td><td>Solana</td><td>yes</td><td>$95M</td><td>n/d</td><td>$210M</td><td>n/d</td><td>0.45</td><td>5x larger</td></tr><tr><td>Peer C</td><td>B</td><td>Move</td><td>none</td><td>n/a</td><td>n/a</td><td>$60M</td><td>n/d</td><td>n/a</td><td>1.5x larger</td></tr></tbody></table></div>
+<p>Illustrative band if tokenised: $12M to $22M, not a price target.</p>
+<h2>Risk register</h2>
+<div class="tbl"><table><thead><tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Why</th></tr></thead><tbody><tr><td>Malicious or mistaken upgrade</td><td>Low</td><td>High</td><td>No timelock over user funds</td></tr><tr><td>Deposit flight after boosts</td><td>Medium</td><td>Medium</td><td>-35% after the last boost</td></tr></tbody></table></div>
+<h2>Key questions for the team</h2>
+<ol><li>When will the ProxyAdmin move behind a timelock?</li><li>Why does the deployed code differ from the audited commit?</li></ol>
+<h2>Investor verdict: WATCH, do not back yet</h2>
+<p>A real but small fee business with fixable control risks.</p></article><article class="sheet rpt"><header class="run"><span>Acme Vaults due diligence</span><span>Scorecard</span></header><h1>Scorecard</h1><div class="bars"><div class="bar-row" data-tip="M1 Technology and security: 4.0/10 (High confidence). Verified ERC-4626 vault and one audit, but a 2-of-3 Safe with no timelock can upgrade the vault instantly (simulated). Admin-key cap applies; about 5.5 without it."><div class="bar-name"><span class="bar-id">M1</span>Technology and security</div><div class="bar-track" role="img" aria-label="Technology and security 4.0 out of 10"><div class="bar-fill weak" style="width:40.0%"></div></div><div class="bar-val"><b>4.0</b><span class="bar-band">Weak</span></div></div><div class="bar-row" data-tip="M2 Legal and regulatory: 3.5/10 (Medium confidence). Entity named in the ToS but not found in a registry; no licence claimed; US exclusion in the ToS is not enforced by the app."><div class="bar-name"><span class="bar-id">M2</span>Legal and regulatory</div><div class="bar-track" role="img" aria-label="Legal and regulatory 3.5 out of 10"><div class="bar-fill weak" style="width:35.0%"></div></div><div class="bar-val"><b>3.5</b><span class="bar-band">Weak</span></div></div><div class="bar-row" data-tip="M3 Business model and economics: 5.0/10 (Medium confidence). Clear 10% performance fee on real yield, about $0.6M derived annual fee income; seed of $4M."><div class="bar-name"><span class="bar-id">M3</span>Business model and economics</div><div class="bar-track" role="img" aria-label="Business model and economics 5.0 out of 10"><div class="bar-fill mixed" style="width:50.0%"></div></div><div class="bar-val"><b>5.0</b><span class="bar-band">Mixed</span></div></div><div class="bar-row" data-tip="M4 Team: 6.0/10 (High confidence). Two doxxed founders with verifiable DeFi roles; small team, hiring one engineer."><div class="bar-name"><span class="bar-id">M4</span>Team</div><div class="bar-track" role="img" aria-label="Team 6.0 out of 10"><div class="bar-fill mixed" style="width:60.0%"></div></div><div class="bar-val"><b>6.0</b><span class="bar-band">Mixed</span></div></div><div class="bar-row" data-tip="M5 Traction and metrics: 5.5/10 (High confidence). $41.2M deposits from 2,310 wallets (verified), but the homepage claims $120M and deposits fell 35% after the boost."><div class="bar-name"><span class="bar-id">M5</span>Traction and metrics</div><div class="bar-track" role="img" aria-label="Traction and metrics 5.5 out of 10"><div class="bar-fill mixed" style="width:55.0%"></div></div><div class="bar-val"><b>5.5</b><span class="bar-band">Mixed</span></div></div><div class="bar-row" data-tip="M6 Tokenomics and governance: 4.5/10 (Medium confidence). No token; points programme without published rules; control sits with the founders&#x27; Safe."><div class="bar-name"><span class="bar-id">M6</span>Tokenomics and governance</div><div class="bar-track" role="img" aria-label="Tokenomics and governance 4.5 out of 10"><div class="bar-fill weak" style="width:45.0%"></div></div><div class="bar-val"><b>4.5</b><span class="bar-band">Weak</span></div></div><div class="bar-row" data-tip="M7 Market, peers and valuation: 5.0/10 (Medium confidence). Crowded category with six larger peers; illustrative band $12M to $22M from peer multiples, not a price target."><div class="bar-name"><span class="bar-id">M7</span>Market, peers and valuation</div><div class="bar-track" role="img" aria-label="Market, peers and valuation 5.0 out of 10"><div class="bar-fill mixed" style="width:50.0%"></div></div><div class="bar-val"><b>5.0</b><span class="bar-band">Mixed</span></div></div><div class="bar-row" data-tip="M8 Community and X sentiment: 5.2/10 (Low confidence). Free reach pass only: median 2,100 views per post, between two peers; one lookalike account; sentiment not measured."><div class="bar-name"><span class="bar-id">M8</span>Community and X sentiment</div><div class="bar-track" role="img" aria-label="Community and X sentiment 5.2 out of 10"><div class="bar-fill mixed" style="width:52.0%"></div></div><div class="bar-val"><b>5.2</b><span class="bar-band">Mixed</span></div></div><div class="bar-axis" aria-hidden="true"><span></span><div class="bar-ticks"><i>0</i><i>5</i><i>10</i></div><span></span></div></div><div class="tbl"><table><thead><tr><th>#</th><th>Category</th><th>Score</th><th>Confidence</th><th>Rationale</th></tr></thead><tbody><tr><td>M1</td><td>Technology and security</td><td><b>4.0</b></td><td>High</td><td>Admin-key cap (about 5.5 without it)</td></tr><tr><td>M2</td><td>Legal and regulatory</td><td><b>3.5</b></td><td>Medium</td><td>No registry entry, no licence, unenforced ToS</td></tr><tr><td>M3</td><td>Business model and economics</td><td><b>5.0</b></td><td>Medium</td><td>Real fee income, modest</td></tr><tr><td>M4</td><td>Team</td><td><b>6.0</b></td><td>High</td><td>Doxxed, relevant track record</td></tr><tr><td>M5</td><td>Traction and metrics</td><td><b>5.5</b></td><td>High</td><td>Verified deposits, falling after boost</td></tr><tr><td>M6</td><td>Tokenomics and governance</td><td><b>4.5</b></td><td>Medium</td><td>No token, opaque points</td></tr><tr><td>M7</td><td>Market, peers and valuation</td><td><b>5.0</b></td><td>Medium</td><td>Crowded category</td></tr><tr><td>M8</td><td>Community and X sentiment</td><td><b>5.2</b></td><td>Low</td><td>Free reach pass only</td></tr><tr><td></td><td><b>Final rating (average)</b></td><td><b>4.8 / 10</b></td><td>Medium</td><td>(4.0 + 3.5 + 5.0 + 6.0 + 5.5 + 4.5 + 5.0 + 5.2) / 8</td></tr></tbody></table></div>
+<p>Caps applied: M1 capped at 4.</p></article></div>
+</main>
+<div id="tip" role="tooltip"></div>
+<script>
+(function(){
+  var tip=document.getElementById('tip');
+  function show(e,t){tip.textContent=t;tip.classList.add('on');var w=tip.offsetWidth,h=tip.offsetHeight;
+    var x=Math.min(e.clientX+14,window.innerWidth-w-8),y=e.clientY+16;if(y+h>window.innerHeight-8)y=e.clientY-h-12;
+    tip.style.left=Math.max(8,x)+'px';tip.style.top=Math.max(8,y)+'px';}
+  document.addEventListener('mousemove',function(e){var t=e.target.closest&&e.target.closest('[data-tip]');
+    if(t)show(e,t.getAttribute('data-tip'));else tip.classList.remove('on');});
+  document.addEventListener('click',function(e){var t=e.target.closest&&e.target.closest('[data-tip]');
+    if(t&&('ontouchstart' in window))show(e,t.getAttribute('data-tip'));else if(!t)tip.classList.remove('on');});
+  var views={onepager:document.getElementById('view-onepager'),report:document.getElementById('view-report')};
+  var btns=document.querySelectorAll('.tabs button');
+  function go(name){if(!views[name])name='onepager';
+    for(var k in views)views[k].hidden=(k!==name);
+    btns.forEach(function(b){b.setAttribute('aria-selected',b.dataset.view===name?'true':'false');});
+    try{history.replaceState(null,'','#'+name);}catch(e){}
+    window.scrollTo(0,0);}
+  btns.forEach(function(b){b.addEventListener('click',function(){go(b.dataset.view);});});
+  var h=(location.hash||'').replace('#','');go(h==='report'?'report':'onepager');
+})();
+</script></body></html>

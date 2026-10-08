@@ -1,0 +1,49 @@
+{
+  "project": "Acme Vaults",
+  "url": "https://acme-vaults.example",
+  "as_of": "2026-10-08",
+  "scale": "1-10, equal weights, final = simple average of the 8 categories",
+  "angle": "investor",
+  "status": "FINAL (fictional example)",
+  "categories": [
+    {"id": "M1", "name": "Technology and security", "score": 4.0, "confidence": "High", "rationale": "Verified ERC-4626 vault and one audit, but a 2-of-3 Safe with no timelock can upgrade the vault instantly (simulated). Admin-key cap applies; about 5.5 without it."},
+    {"id": "M2", "name": "Legal and regulatory", "score": 3.5, "confidence": "Medium", "rationale": "Entity named in the ToS but not found in a registry; no licence claimed; US exclusion in the ToS is not enforced by the app."},
+    {"id": "M3", "name": "Business model and economics", "score": 5.0, "confidence": "Medium", "rationale": "Clear 10% performance fee on real yield, about $0.6M derived annual fee income; seed of $4M."},
+    {"id": "M4", "name": "Team", "score": 6.0, "confidence": "High", "rationale": "Two doxxed founders with verifiable DeFi roles; small team, hiring one engineer."},
+    {"id": "M5", "name": "Traction and metrics", "score": 5.5, "confidence": "High", "rationale": "$41.2M deposits from 2,310 wallets (verified), but the homepage claims $120M and deposits fell 35% after the boost."},
+    {"id": "M6", "name": "Tokenomics and governance", "score": 4.5, "confidence": "Medium", "rationale": "No token; points programme without published rules; control sits with the founders' Safe."},
+    {"id": "M7", "name": "Market, peers and valuation", "score": 5.0, "confidence": "Medium", "rationale": "Crowded category with six larger peers; illustrative band $12M to $22M from peer multiples, not a price target."},
+    {"id": "M8", "name": "Community and X sentiment", "score": 5.2, "confidence": "Low", "rationale": "Free reach pass only: median 2,100 views per post, between two peers; one lookalike account; sentiment not measured.", "sub_scores": {"reach": 5.0, "endorsement_quality": 5.5, "sentiment": 5.5, "authenticity": 4.8}}
+  ],
+  "final_rating": 4.8,
+  "average_confidence": "Medium",
+  "caps_applied": ["M1 capped at 4 (instant upgrade by a 2-of-3 Safe, no timelock)"],
+  "verdict": "WATCH, do not back yet",
+  "onepager": {
+    "logo": "acme-mark.svg",
+    "logo_mono": true,
+    "category_tag": "DeFi / Yield vaults · Fictional chain · USDC",
+    "tagline": "Curated USDC yield vaults that keep a 10% performance fee on the yield they earn. **Fictional example.**",
+    "verdict_label": "WATCH, do not back yet",
+    "tldr": "A small, real-yield vault business with doxxed founders and verified deposits of $41.2M, a third of the homepage claim. The 2-of-3 Safe can upgrade the vault with no delay, which caps security at 4. Fee income is modest and the category is crowded. Watch for a timelock and published points rules.",
+    "kpis": [
+      ["Deposits", "$41.2M", "verified, `totalAssets()`"],
+      ["Homepage TVL", "$120M", "claimed"],
+      ["Depositors", "2,310", "top 10 hold 58%"],
+      ["Fee income", "$0.6M", "per year, derived"],
+      ["Rank vs direct peers", "#4 of 7", "on deposits"],
+      ["Funding", "$4M", "seed, 2026"]
+    ],
+    "strengths": ["Real yield with a simple fee model, no emissions needed to pay depositors.", "Verified contracts, one audit with all high findings fixed.", "Doxxed founders with verifiable DeFi track records."],
+    "risks": ["A 2-of-3 Safe can upgrade the vault instantly: no timelock over user funds.", "Deployed code is 140 lines larger than the audited commit.", "Homepage TVL is three times verified deposits.", "Deposits fell 35% when the points boost ended."],
+    "facts": [["Entity", "Acme Vaults Ltd (fictional), registry n/d"], ["Team", "2 founders, doxxed"], ["Funding", "$4M seed"], ["Token", "None; points programme"], ["Audits", "1 (2026-06), 2 high fixed"], ["Admin", "2-of-3 Safe, no timelock"], ["Licence", "None claimed"], ["Revenue", "about $0.6M per year, derived"]],
+    "peers": [["Peer A (EVM)", "mcap $310M, TVL $900M", "mcap/TVL 0.34"], ["Peer B (Solana)", "mcap $95M, TVL $210M", "mcap/TVL 0.45"], ["Peer C (Move)", "no token, TVL $60M", "n/a"]],
+    "peers_note": "Illustrative value if tokenised, from peer mcap/TVL quartiles: $12M to $22M. Not a price target.",
+    "investor_view": "**Equity:** fair at seed terms only with a timelock commitment. **Token / protocol exposure:** nothing to buy yet; points farming carries the admin risk. **As a user:** size deposits to what you can lose to an upgrade.",
+    "would_raise": ["A 48 h or longer timelock on the ProxyAdmin", "A second audit of the deployed code", "Deposits holding up without boosts"],
+    "would_lower": ["An upgrade without notice", "Enforcement against the front-end", "Further deposit outflows"],
+    "links": [["Website", "https://acme-vaults.example"], ["Docs", "https://docs.acme-vaults.example"], ["Audit", "https://audits.example/acme-vaults-2026.pdf"], ["Explorer", "https://explorer.example/address/0x1111111111111111111111111111111111111111"]],
+    "scale_note": "Scale 1 to 10, equal weights. Tech is capped at 4 by the admin-key rule (about 5.5 without it).",
+    "footer": "As of 2026-10-08. FICTIONAL EXAMPLE: the project, people, numbers and sources are invented. Not investment advice. Rating is the simple average of 8 category scores in scorecard.json."
+  }
+}

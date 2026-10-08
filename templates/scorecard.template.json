@@ -1,0 +1,50 @@
+{
+  "project": "{{NAME}}",
+  "url": "{{URL}}",
+  "as_of": "{{DATE}}",
+  "scale": "1-10, equal weights, final = simple average of the 8 categories",
+  "angle": "investor",
+  "status": "DRAFT",
+  "categories": [
+    {"id": "M1", "name": "Technology and security", "score": null, "confidence": "Medium", "rationale": "One or two sentences, with the cap if one applies (say what the score would be without it)."},
+    {"id": "M2", "name": "Legal and regulatory", "score": null, "confidence": "Medium", "rationale": ""},
+    {"id": "M3", "name": "Business model and economics", "score": null, "confidence": "Medium", "rationale": ""},
+    {"id": "M4", "name": "Team", "score": null, "confidence": "Medium", "rationale": ""},
+    {"id": "M5", "name": "Traction and metrics", "score": null, "confidence": "Medium", "rationale": ""},
+    {"id": "M6", "name": "Tokenomics and governance", "score": null, "confidence": "Medium", "rationale": "No token: score the capital structure and the control model instead."},
+    {"id": "M7", "name": "Market, peers and valuation", "score": null, "confidence": "Medium", "rationale": ""},
+    {"id": "M8", "name": "Community and X sentiment", "score": null, "confidence": "Medium", "rationale": "", "sub_scores": {"reach": null, "endorsement_quality": null, "sentiment": null, "authenticity": null}}
+  ],
+  "final_rating": null,
+  "average_confidence": "Medium",
+  "caps_applied": [],
+  "verdict": "",
+  "onepager": {
+    "logo": "",
+    "logo_mono": true,
+    "category_tag": "Sector / Subsector · Chain · Asset",
+    "tagline": "One sentence on what it is and who pays whom.",
+    "verdict_label": "WATCH, do not back yet",
+    "tldr": "Three or four sentences: what it is, headline verified metrics, the main strength, the main risk, and why the rating is what it is.",
+    "kpis": [
+      ["Metric 1", "value", "unit or qualifier"],
+      ["Metric 2", "value", "unit or qualifier"],
+      ["Metric 3", "value", "unit or qualifier"],
+      ["Metric 4", "value", "unit or qualifier"],
+      ["Rank vs direct peers", "#x of y", "on <metric>"],
+      ["Funding", "$xM", "round, date"]
+    ],
+    "strengths": ["", "", ""],
+    "risks": ["", "", "", ""],
+    "facts": [
+      ["Entity", ""], ["Team", ""], ["Funding", ""], ["Token", ""], ["Audits", ""], ["Admin", ""], ["Licence", ""], ["Revenue", ""]
+    ],
+    "peers": [["Peer", "token and mcap or TVL", "multiple or note"]],
+    "peers_note": "Illustrative value if tokenised, from peer multiples: ... Not a price target.",
+    "investor_view": "**Equity:** ... **Token / protocol exposure:** ... **As a user:** ...",
+    "would_raise": ["", "", ""],
+    "would_lower": ["", "", ""],
+    "links": [["Website", "{{URL}}"], ["Docs", ""], ["X", ""], ["GitHub", ""], ["Audits", ""], ["Explorer", ""]],
+    "scale_note": "Scale 1 to 10, equal weights. Bars: weak 3 to 4.9, mixed 5 to 6.9, strong 7 and above."
+  }
+}
