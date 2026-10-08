@@ -2,9 +2,12 @@
 
 Everything that ends up in a file path, a URL or an HTML attribute goes through one of these checks first.
 """
+import ipaddress
+import math
 import os
 import re
 import sys
+import unicodedata
 from datetime import datetime
 from urllib.parse import urlsplit
 
@@ -56,13 +59,64 @@ def safe_url(u, schemes=("http", "https")):
     u = u.strip()
     if not u or any(c in URL_FORBIDDEN for c in u):
         return None
+    if any(unicodedata.category(c) == "Cf" for c in u):  # bidi overrides, zero-width characters
+        return None
     try:
         p = urlsplit(u)
+        host = p.hostname or ""
     except ValueError:
         return None
-    if p.scheme.lower() not in schemes or not p.netloc:
+    if p.scheme.lower() not in schemes or not p.netloc or not host:
+        return None
+    if "@" in p.netloc:  # https://official.example@other.example/ shows one host and opens another
+        return None
+    if not host.isascii():  # look-alike Unicode hosts; use the xn-- form if an IDN is genuinely needed
+        return None
+    try:
+        ipaddress.ip_address(host.strip("[]"))
+        return None  # IP-literal hosts (127.0.0.1, private ranges) never belong in a public report
+    except ValueError:
+        pass
+    if host == "localhost" or host.endswith(".localhost") or host.endswith(".local"):
         return None
     return u
+
+
+def check_score(x):
+    """A finite number between 1 and 10."""
+    if isinstance(x, bool) or not isinstance(x, (int, float)) or not math.isfinite(x) or not 1 <= x <= 10:
+        raise ValueError(f"score {x!r} must be a finite number between 1 and 10")
+    return x
+
+
+IMAGE_MAGIC = ((b"\x89PNG\r\n\x1a\n", "image/png"), (b"\xff\xd8\xff", "image/jpeg"), (b"GIF8", "image/gif"))
+MAX_LOGO_BYTES = 5 * 1024 * 1024
+
+
+def read_asset(assets_dir, name):
+    """Read a logo from assets/: plain file name, no symlinks, must resolve inside assets/, at most 5 MB,
+    and the bytes must really be PNG, JPEG, GIF, WebP or SVG. Returns (mime, bytes)."""
+    check_asset_name(name)
+    base = os.path.realpath(assets_dir)
+    path = os.path.join(assets_dir, name)
+    if os.path.islink(path):
+        raise ValueError(f"assets/{name} is a symbolic link; copy the real file into assets/ instead")
+    real = os.path.realpath(path)
+    if os.path.dirname(real) != base or not os.path.isfile(real):
+        raise ValueError(f"assets/{name} is not a regular file inside assets/")
+    if os.path.getsize(real) > MAX_LOGO_BYTES:
+        raise ValueError(f"assets/{name} is larger than 5 MB")
+    with open(real, "rb") as f:
+        data = f.read()
+    for magic, mime in IMAGE_MAGIC:
+        if data.startswith(magic):
+            return mime, data
+    if data[:4] == b"RIFF" and data[8:12] == b"WEBP":
+        return "image/webp", data
+    head = data[:2048].lstrip(b"\xef\xbb\xbf \t\r\n").lower()
+    if name.lower().endswith(".svg") and (head.startswith(b"<svg") or head.startswith(b"<?xml")) and b"<svg" in data[:4096].lower():
+        return "image/svg+xml", data
+    raise ValueError(f"assets/{name} is not a PNG, JPEG, GIF, WebP or SVG image")
 
 
 def project_dir(arg, must_exist=True):

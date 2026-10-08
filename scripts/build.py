@@ -16,11 +16,11 @@ The 1-pager must be exactly one A4 page; --pdf fails (exit 2) if the PDF has mor
 EVM_DD_HOME overrides the workspace (default ~/evm-dd).
 Security: all text is HTML-escaped; links must be absolute http(s) URLs (others are dropped); the logo must be a plain
 file name inside assets/."""
-import argparse, base64, html, importlib.util, json, mimetypes, os, re, shutil, subprocess, sys
+import argparse, base64, html, importlib.util, json, os, re, shutil, subprocess, sys
 from datetime import datetime
 from types import SimpleNamespace
 
-from ddlib import check_asset_name, die, project_dir, safe_url
+from ddlib import check_score, die, project_dir, read_asset, safe_url
 
 HERE = SC = MD = OP = NAME = LOGO = None  # filled by init()
 
@@ -34,6 +34,11 @@ def init(project_dir):
     MD = open(os.path.join(HERE, "report.md"), encoding="utf-8").read()
     OP = SC.get("onepager") or sys.exit("scorecard.json has no 'onepager' block (see templates/scorecard.template.json)")
     NAME = SC["project"]
+    for c in SC["categories"]:
+        try: check_score(c.get("score"))
+        except ValueError as e: die(f"{c.get('id')}: {e}")
+    try: check_score(SC.get("final_rating"))
+    except ValueError as e: die(f"final_rating: {e}")
     LOGO = load_logo()
     mean = sum(c["score"] for c in SC["categories"]) / len(SC["categories"])
     if abs(round(mean + 1e-9, 1) - SC["final_rating"]) > 0.051:
@@ -46,18 +51,16 @@ def esc(s): return html.escape(str(s), quote=True)
 def load_logo():
     name = OP.get("logo")
     if not name: return ("mono", None)
-    try: check_asset_name(name)
-    except ValueError as e: die(str(e))
-    path = os.path.join(HERE, "assets", name)
-    if not os.path.exists(path): sys.exit(f"onepager.logo not found: {path}")
-    if name.lower().endswith(".svg"):
-        svg = open(path, encoding="utf-8").read()
+    try: mime, raw = read_asset(os.path.join(HERE, "assets"), name)
+    except (ValueError, OSError) as e: die(f"onepager.logo: {e}")
+    if mime == "image/svg+xml":
+        svg = raw.decode("utf-8", "replace")
         if OP.get("logo_mono", True):
-            ds = re.findall(r'<path[^>]*?\sd="([^"]+)"', svg)
-            vb = re.search(r'viewBox="([^"]+)"', svg)
+            ds = re.findall(r'<path[^>]*?\sd="([^"<>]+)"', svg)
+            vb = re.search(r'viewBox="([0-9eE.,+\s-]+)"', svg)
             if ds and vb: return ("paths", (vb.group(1), " ".join(ds)))
-        return ("img", ("image/svg+xml", svg.encode("utf-8")))
-    return ("img", (mimetypes.guess_type(path)[0] or "image/png", open(path, "rb").read()))
+    # SVG embedded as an <img> data URI: scripts inside it do not run there
+    return ("img", (mime, raw))
 
 def logo(size):
     kind, data = LOGO
@@ -149,7 +152,7 @@ def inline(t):
     t = re.sub(r"`([^`]+)`", keep, t)
     t = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", t)
     t = re.sub(r"(?<![\w*])\*(?!\s)(.+?)(?<!\s)\*(?![\w*])", r"<i>\1</i>", t)
-    t = re.sub(r"\[([^\]]+)\]\((https?://[^)\s]+)\)", r'<a href="\2" target="_blank" rel="noopener noreferrer">\1</a>', t)
+    t = re.sub(r"\[([^\]\n]{1,300})\]\((https?://[^)\s]{1,2000})\)", r'<a href="\2" target="_blank" rel="noopener noreferrer">\1</a>', t)
     def autolink(m):
         u = m.group(0); tail = ""
         while u and u[-1] in ".,;)": tail = u[-1] + tail; u = u[:-1]

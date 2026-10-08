@@ -4,7 +4,7 @@ Usage: python3 scripts/check.py <project-slug-or-dir>
 Exit 0 = no errors (warnings may remain), 1 = errors. Judgement items (sources really back each number,
 contracts opened on the explorer, adversarial pass done) stay manual."""
 import json, os, re, sys
-from ddlib import project_dir, safe_url
+from ddlib import project_dir, read_asset, safe_url
 arg = sys.argv[1] if len(sys.argv) > 1 else sys.exit(__doc__)
 P = project_dir(arg)
 errors, warns = [], []
@@ -43,7 +43,9 @@ if len(op.get("kpis", [])) != 6: err(f"onepager.kpis must have 6 entries, has {l
 for k in ("strengths", "risks", "would_raise", "would_lower", "facts", "links"):
     if not op.get(k): err(f"onepager.{k} empty")
 if not op.get("peers"): warn("onepager.peers empty (peer snapshot is part of the 1-pager spec)")
-if op.get("logo") and not os.path.exists(os.path.join(P, "assets", op["logo"])): err(f"logo file missing: assets/{op['logo']}")
+if op.get("logo"):
+    try: read_asset(os.path.join(P, "assets"), op["logo"])
+    except (ValueError, OSError) as e: err(f"onepager.logo: {e}")
 if not op.get("logo"): warn("no logo set: the page will show a monogram (QA wants the official logo)")
 for item in op.get("links", []):
     if len(item) != 2 or not safe_url(item[1]): err(f"onepager.links: {item!r} is not a [label, http(s) url] pair (it would be dropped from the page)")
