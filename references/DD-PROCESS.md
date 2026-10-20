@@ -1,5 +1,6 @@
-# EVM Project Due Diligence Process (v2.0, 2026-10-08)
+# EVM Project Due Diligence Process (v2.1, 2026-10-08)
 
+> v2.1 (2026-10-08): section 10.13 off-chain B2B infrastructure and private companies; 375 px check in 10.12.
 > v2.0 (2026-10-08): open-source release. Intake step added, field notes from about fifteen real runs merged into section 10 without project names, safety and fairness rules in section 11. History: v1.0 to v1.9 were private iterations (2026-10-02 to 2026-10-07).
 
 Reusable process for investor-angle due diligence on crypto and EVM projects. Angle: **investor** by default (would we back / hold / avoid, and why); the intake can switch the emphasis to a user or partner angle without changing the rubric.
@@ -319,6 +320,18 @@ These notes come from about fifteen private runs between 2026-10-02 and 2026-10-
 - One A4 page is tight: tldr under about 60 to 70 words, 4 risks of about 20 words, 8 one-line facts, 4 peers, 7 to 11 links. `build.py --pdf` fails with exit 2 above one page.
 - Logos: if only a dark-on-transparent PNG exists, composite it on a light tile and set `logo_mono: false`.
 - Check the published page at desktop and 375 px width; local `file://` pages may not be inspectable in every browser tool.
+- Headless Chrome clamps `--window-size` to at least 500 px, so a "375 px" screenshot is a cropped 500 px layout. For a real 375 px check, load the page in a 375 px iframe wrapper and have the page post `innerWidth`, `scrollWidth` and any element whose right edge passes the viewport to the parent (`--allow-file-access-from-files --dump-dom`).
+
+### 10.13 Off-chain B2B infrastructure and private companies
+
+- **No contracts is not no evidence.** For middleware that builds transactions which a client signs in its own custody, M1 rests on: the production app bundle (grep what the front-end sends to the API; one run found a custody "initiator" key read with `FileReader` and posted on every operation while the docs said it stays with the client), the custody integration guides (raw signing means the custody policy engine cannot parse the payload; ask who decodes the hash and whether that decoder is independent and reachable), the operator's own validators, certificate claims against the company's own compliance pages (roadmap items shown as "certified"; DORA is a regulation, not a certificate), and passive headers and CT logs. The admin-key cap is about onchain control: score the off-chain trust path inside M1 and say why the cap does not apply.
+- **Validator operators:** Cosmos-SDK `slashing/v1beta1/signing_infos/<valcons>` plus the chain's `downtime_jail_duration` dates each jailing; `/staking/v1beta1/validators/<valoper>/delegations` gives delegator concentration (one delegator holding over 90% of a validator's stake is common and is a revenue risk). NEAR pool RPC, TzKT, the SSV API (operator owner and cluster composition: four operators of one company is no operator diversity) and Babylon finality-provider endpoints cover the rest.
+- **Filed accounts are the best traction evidence for a private company.** Italian S.r.l. filings are copied by free aggregator pages (use two that agree to the euro); Swiss Zefix REST `firm/<id>.json` includes the gazette texts (capital increases, board, audit opt-out) and the cantonal register serves the statutes (option pool, capital band). GLEIF parent exceptions are informative: NON_CONSOLIDATING means an unnamed parent company exists, NATURAL_PERSONS means control by individuals. Check whether the registered seat is the director's own firm.
+- **Investor-side confirmation:** a listed investor's exchange notice names the legal entity and the CEO at the date of the round. Comparing it with Wayback captures of the About page caught an unannounced CEO change.
+- **Case-study clients:** check each named client for links to the founders (earlier Wayback team pages, the client site's disclaimer naming the firm that approved it). Write the link as an inference next to the quotes.
+- **Feed filed revenue to the peers work.** The peers agent runs in parallel and built its revenue-multiple grid on hypothetical revenue; apply the multiples to the filed figure in the cross-check.
+- **Exit comparables beat stale rounds.** Acquirers' 10-Q business-combination notes give exact prices for small staking-software deals (one sold for about 0.4x the capital it had raised). SEC EDGAR wants a declared User-Agent: use a generic one, never the user's identity.
+- **MiCA status:** read the ESMA interim CASP CSV (note its Last-Modified header) and the national regulator's end-of-transition release; national VASP registrations lapsed with the transition. Non-custodial software plausibly sits outside the CASP perimeter, but any earlier custody activity needed a licence after the transition ended.
 
 ## 11. Safety and fairness rules
 

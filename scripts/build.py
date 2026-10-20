@@ -105,9 +105,10 @@ def table_view(headers, rows):
     return f'<details class="tableview"><summary>View as table</summary><div class="tbl"><table><thead><tr>{th}</tr></thead><tbody>{trs}</tbody></table></div></details>'
 
 def bar_chart(values, labels, *, title, caption, source, aria, ymax=None, yticks=None, highlight=(), tips=None, notes=(),
-              table_headers=("Label", "Value"), width=760, height=250):
+              table_headers=("Label", "Value"), width=760, height=250, table_labels=None):
     """Single-series bar chart in the house style. values: numbers; labels: x labels ('' = none); highlight: indexes;
-    tips: hover text per bar; notes: [(index, 'text')] callouts above the bars. Returns a <figure> with a table view."""
+    tips: hover text per bar; notes: [(index, 'text')] callouts above the bars; table_labels: full row labels for the
+    table view when some x labels are blank. Returns a <figure> with a table view."""
     n = len(values)
     ymax = ymax or max(values) * 1.12
     if not yticks: yticks = [round(ymax * k / 3, -int(len(str(int(ymax))) - 2)) for k in range(0, 3)]
@@ -130,7 +131,8 @@ def bar_chart(values, labels, *, title, caption, source, aria, ymax=None, yticks
         out.append(f'<text x="{xr-8:.1f}" y="{mt-10}" class="note" text-anchor="end">{esc(text)}</text>')
         out.append(f'<line x1="{xr-6:.1f}" x2="{xr:.1f}" y1="{mt-14}" y2="{mt+2}" class="lead"/>')
     out.append("</svg>")
-    table = table_view(table_headers, [[labels[i] or i + 1, f"{v:,}" if isinstance(v, int) else v] for i, v in enumerate(values)])
+    rl = table_labels or labels
+    table = table_view(table_headers, [[rl[i] or i + 1, f"{v:,}" if isinstance(v, int) else v] for i, v in enumerate(values)])
     return (f'<figure class="figure"><figcaption><b>{esc(title)}</b>. {esc(caption)}</figcaption>{"".join(out)}'
             f'<div class="chart-src">{esc(source)}</div>{table}</figure>')
 

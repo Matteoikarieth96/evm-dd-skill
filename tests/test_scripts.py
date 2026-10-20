@@ -33,6 +33,16 @@ class TempProject(unittest.TestCase):
         with open(os.path.join(self.proj, "site", "fictional-protocol.html"), encoding="utf-8") as f: return f.read()
 
 
+
+class TestChartHelper(unittest.TestCase):
+    def test_table_labels_fill_blank_axis_labels(self):
+        import build
+        kw = dict(title="t", caption="c", source="s", aria="a")
+        fig = build.bar_chart([1, 2, 3], ["Q1", "", "Q3"], table_labels=["Q1", "Q2", "Q3"], **kw)
+        self.assertIn("<td>Q2</td>", fig)
+        old = build.bar_chart([1, 2, 3], ["Q1", "", "Q3"], **kw)
+        self.assertIn("<td>2</td>", old)  # unchanged fallback when no table_labels are given
+
 class TestExample(TempProject):
     def test_build_and_check_pass(self):
         r = run("build.py", self.proj, env=self.env)

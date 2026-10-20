@@ -42,4 +42,4 @@ One project in, one verdict out. The default angle is **investor** (back / watch
 
 ## When the process needs to change
 
-DD-PROCESS.md is versioned (v2.0). A reusable lesson goes into section 10 without names, with the version bumped and the date noted at the top; mechanical fixes go into `scripts/` with a test in `tests/`. `examples/fictional-protocol/` is the regression: `build.py` and `check.py` must keep passing on it (`python3 -m unittest discover -s tests`).
+DD-PROCESS.md is versioned (v2.1). A reusable lesson goes into section 10 without names, with the version bumped and the date noted at the top; mechanical fixes go into `scripts/` with a test in `tests/`. `examples/fictional-protocol/` is the regression: `build.py` and `check.py` must keep passing on it (`python3 -m unittest discover -s tests`).
