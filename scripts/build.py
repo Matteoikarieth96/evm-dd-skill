@@ -518,7 +518,7 @@ def page_count(pdf):
     return len(re.findall(rb"/Type\s*/Page[^s]", open(pdf, "rb").read()))
 
 def render_pdf(html_path, pdf_path):
-    cmd = [find_chrome(), "--headless=new", "--disable-gpu", "--no-pdf-header-footer", "--virtual-time-budget=6000",
+    cmd = [find_chrome(), "--headless=new", "--use-mock-keychain", "--password-store=basic", "--disable-gpu", "--no-pdf-header-footer", "--virtual-time-budget=6000",
            f"--print-to-pdf={pdf_path}", "file://" + html_path]
     subprocess.run(cmd, capture_output=True, timeout=120)
     if not os.path.exists(pdf_path): sys.exit("PDF was not produced")
