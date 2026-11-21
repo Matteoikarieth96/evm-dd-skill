@@ -1,6 +1,6 @@
 ---
 name: evm-dd
-description: Run an investor-angle due diligence on a crypto or EVM project and deliver a scored report plus a one-page tearsheet (web page + A4 PDF). Use this whenever the user gives a project link or name and asks for DD, due diligence, a one-pager, a scorecard, a rating, "is this project legit", "analizza/fai la DD su", "valuta questo progetto", even if they do not say "skill". It starts with a short intake interview, then runs 5 parallel research agents (tech, legal and team, business and traction and token, market and community, peers), an X-sentiment pass, a lead cross-check of every score-moving fact, an 8-category 1 to 10 scorecard (rating = simple average), the report (TL;DR + 3 pages) and the 1-pager. Not for quick factual questions about a project (answer those directly).
+description: Investor-angle due diligence on a crypto or EVM project, delivered as a scored report plus a one-page tearsheet (web page + A4 PDF). Use when the user gives a project link or name and asks for DD, due diligence, a one-pager, a scorecard or a rating, or says "is this project legit", "analizza/fai la DD su", "valuta questo progetto". Not for quick factual questions about a project.
 ---
 
 # evm-dd: due diligence to a one-pager
